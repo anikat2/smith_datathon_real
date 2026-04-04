@@ -1,4 +1,4 @@
-﻿# smith_datathon
+# smith_datathon
 
 ## initial setup
 install git 
@@ -61,20 +61,10 @@ usually if you recently commited, there should be a yellow notification on the t
 
 otherwise, on the 2 dropdowns, make `base: main` and `compare: BRANCH_NAME` and replace BRANCH_NAME with the name of your branch.
 
+run `pip install -r requirements.txt`
+
 then click `Create pull request`
 
 if you see something called a merge conflict, you can use the merge conflict editor on the website, and pick either the code in main or the code in your branch.
 
 if there's a merge conflict that means you and the main branch have conflicting code, so only one can exist at a time. usually you can just pick your code.
-
-## Sample .env
-you need to set up environment folder, do this by
-
-`code .env`
-
-then add to .env
-
-DF_PATH=REPLACE_WITH_Choose_Maryland___Compare_Counties_DATASET_PATH
-DF2_PATH=REPLACE_WITH_On_Time_Performance_DATASET_PATH
-
-then save and run

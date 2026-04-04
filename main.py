@@ -1,8 +1,14 @@
+import os
 import pandas as pd
 import matplotlib.pyplot as plt
+from dotenv import load_dotenv
 
-df = pd.read_csv("C:\\Users\\anika\\Desktop\\development\\smith_datathon\\datasets\\Choose_Maryland___Compare_Counties_-_Transportation_20260403.csv")
-df_ontime = pd.read_csv("C:\\Users\\anika\\Desktop\\development\\smith_datathon\\datasets\\On_Time_Performance_20260403.csv")
+os.makedirs("output", exist_ok=True)
+
+load_dotenv()
+
+df = pd.read_csv(os.getenv("DF_PATH"))
+df_ontime = pd.read_csv(os.getenv("DF2_PATH"))
 
 def commute_data(df):
     df.columns = df.columns.str.strip()

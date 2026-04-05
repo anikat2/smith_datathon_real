@@ -9,6 +9,7 @@ load_dotenv()
 
 df = pd.read_csv(os.getenv("DF_PATH"))
 df_ontime = pd.read_csv(os.getenv("DF2_PATH"))
+df_road = pd.read_csv("datasets/Maryland_Road_Closures_20260403.csv")
 
 def commute_data(df):
     df.columns = df.columns.str.strip()
@@ -74,3 +75,43 @@ def on_time(df):
     plt.savefig("output/ontime_performance.png", bbox_inches='tight', dpi=300)
 
 on_time(df_ontime)
+
+
+def road_closure_data(df):
+    df.columns = df.columns.str.strip().str.lower()
+
+    df["county"] = df["county"].astype(str).str.strip()
+    df["direction"] = df["direction"].astype(str).str.strip()
+    df["lanes"] = df["lanes"].astype(str).str.strip()
+
+    county_counts = df["county"].value_counts().head(10)
+    direction_counts = df["direction"].value_counts()
+    lane_counts = df["lanes"].value_counts().head(10)
+    lane_counts = lane_counts.sort_values()
+
+    fig, axes = plt.subplots(3, 1, figsize=(14, 18))
+
+    county_counts.plot(kind="bar", ax=axes[0])
+    axes[0].set_title("Top 10 Counties by Road Closures")
+    axes[0].set_xlabel("County")
+    axes[0].set_ylabel("Number of Closures")
+    axes[0].tick_params(axis="x", rotation=45)
+
+    direction_counts.plot(kind="bar", ax=axes[1])
+    axes[1].set_title("Road Closures by Direction")
+    axes[1].set_xlabel("Direction")
+    axes[1].set_ylabel("Number of Closures")
+    axes[1].tick_params(axis="x", rotation=45)
+
+    lane_counts.plot(kind="barh", ax=axes[2])
+    axes[2].set_title("Top 10 Lane Closure Types")
+    axes[2].set_xlabel("Number of Closures")
+    axes[2].set_ylabel("Lane Type")
+
+    for i, v in enumerate(lane_counts.values):
+        axes[2].text(v + 0.1, i, str(v), va="center")
+
+    plt.tight_layout()
+    plt.savefig("output/road_closure_summary.png", bbox_inches="tight", dpi=300)
+
+road_closure_data(df_road)

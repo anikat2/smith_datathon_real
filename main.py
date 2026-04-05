@@ -9,10 +9,10 @@ os.makedirs("output", exist_ok=True)
 
 load_dotenv()
 
-df = pd.read_csv(os.getenv("DF_PATH"))
+df_commute = pd.read_csv(os.getenv("DF_PATH"))
 df_ontime = pd.read_csv(os.getenv("DF2_PATH"))
-df_road = pd.read_csv("datasets/Maryland_Road_Closures_20260403.csv")
-df_abc = pd.read_csv(os.getenv("DF3_PATH"))
+df_road = pd.read_csv(os.getenv("DF3_PATH"))
+df_projects = pd.read_csv(os.getenv("DF4_PATH"))
 
 def commute_data(df):
     df.columns = df.columns.str.strip()
@@ -77,9 +77,6 @@ def on_time(df):
 
     plt.savefig("output/ontime_performance.png", bbox_inches='tight', dpi=300)
 
-on_time(df_ontime)
-
-
 def road_closure_data(df):
     df.columns = df.columns.str.strip().str.lower()
 
@@ -117,11 +114,6 @@ def road_closure_data(df):
     plt.tight_layout()
     plt.savefig("output/road_closure_summary.png", bbox_inches="tight", dpi=300)
 
-road_closure_data(df_road)
-# ── OPTION A ─────────────────────────────────────────────────────────────────
-# Horizontal bar chart: total project count by Transportation Business Unit
-# Shows which agency is driving the most CTP investment statewide
-# ─────────────────────────────────────────────────────────────────────────────
 def projects_by_agency(df):
     df = df.copy()
     df.columns = df.columns.str.strip()
@@ -191,12 +183,6 @@ def projects_by_agency(df):
                 facecolor=fig.get_facecolor())
     plt.close()
 
-
-# ── OPTION B ─────────────────────────────────────────────────────────────────
-# Stacked bar chart: top counties by project count, stacked by agency
-# Reveals which agencies are driving investment in each county
-# Excludes Areawide/Statewide catch-alls to show geographically specific data
-# ─────────────────────────────────────────────────────────────────────────────
 def county_breakdown_by_agency(df):
     df = df.copy()
     df.columns = df.columns.str.strip()
@@ -282,12 +268,6 @@ def county_breakdown_by_agency(df):
                 facecolor=fig.get_facecolor())
     plt.close()
 
-
-# ── OPTION C ─────────────────────────────────────────────────────────────────
-# Geographic scatter plot: all CTP projects plotted by lat/lon
-# Colored by Transportation Business Unit
-# Shows spatial concentration of investment across Maryland
-# ─────────────────────────────────────────────────────────────────────────────
 def statewide_project_map(df):
     df = df.copy()
     df.columns = df.columns.str.strip()
@@ -376,8 +356,48 @@ def statewide_project_map(df):
                 facecolor=fig.get_facecolor())
     plt.close()
 
-projects_by_agency(df_abc)
-county_breakdown_by_agency(df_abc)
-statewide_project_map(df_abc)
-#help me
+def route_ontime():
+    # from 01/01/25 to 08/23/25 (newest data)
+    citylink_routes = {
+                        "Citylink BLUE": 69.2, 
+                        "Citylink BROWN": 73.9,
+                        "Citylink GOLD": 76.7,
+                        "Citylink GREEN": 75.2,
+                        "Citylink LIME": 72.7,
+                        "Citylink NAVY": 68.0,
+                        "Citylink ORANGE": 70.3,
+                        "Citylink PINK": 76.3,
+                        "Citylink PURPLE": 79.5,
+                        "Citylink RED": 70.0,
+                        "Citylink SILVER": 70.7,
+                        "Citylink YELLOW": 73.1,
+                        }
+    citylink_df = pd.DataFrame({
+        "Route": list(citylink_routes.keys()),  
+        "On-Time Performance (%)": list(citylink_routes.values())
+    })
+    citylink_df = citylink_df.sort_values(by="On-Time Performance (%)", ascending=True)
 
+    plt.figure(figsize=(10, 6))
+    bars = plt.barh(citylink_df["Route"], citylink_df["On-Time Performance (%)"], color="#E63946", edgecolor="none", height=0.6)
+
+    for bar in bars:
+        width = bar.get_width()
+        plt.text(width + 0.5, bar.get_y() + bar.get_height() / 2,
+                 f"{width:.1f}%", va="center", ha="left", color="white", fontsize=9)
+    plt.xlabel("On-Time Performance (%)", color="#AAAAAA", fontsize=11)
+    plt.title("MTA Citylink Routes: On-Time Performance (2025 YTD)",
+                fontsize=14, fontweight="bold", color="white", pad=14)
+    plt.xlim(0, 100)
+    plt.grid(axis="x", color="#2A2F45", linewidth=0.5, linestyle="--", alpha=0.6)
+    plt.gca().set_facecolor("#141824")
+    plt.gca().tick_params(colors="#AAAAAA", labelsize=10)
+    for spine in plt.gca().spines.values():
+        spine.set_visible(False)
+
+    plt.tight_layout()
+    plt.savefig("output/citylink_ontime.png", bbox_inches="tight", dpi=300,
+                facecolor=plt.gcf().get_facecolor())
+    plt.close()
+    
+route_ontime()

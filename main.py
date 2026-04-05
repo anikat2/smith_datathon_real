@@ -376,7 +376,8 @@ def statewide_project_map(df):
                 facecolor=fig.get_facecolor())
     plt.close()
 
-# projects_by_agency(df_abc)
-# county_breakdown_by_agency(df_abc)
-# statewide_project_map(df_abc)
+projects_by_agency(df_abc)
+county_breakdown_by_agency(df_abc)
+statewide_project_map(df_abc)
 #help me
+
